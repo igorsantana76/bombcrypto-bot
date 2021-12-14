@@ -161,18 +161,20 @@ def getSliderPositions(screenshot, popup_pos):
 
 
 def solveCaptcha():
+    
     screenshot = printSreen()
     img = screenshot.copy()
     popup_pos = positions(d['robot'],img=img)
     print(popup_pos)
+
     if len(popup_pos) == 0:
         print('no captcha popup found!')
         return
+        
     img = captchaImg(img, popup_pos[0])
     digits = getDigits(d, img)
     slider_positions = getSliderPositions(screenshot, popup_pos)
     # moveSlider(screenshot,3,popup_pos)
-
 
     for position in slider_positions:
         x, y = position
@@ -186,7 +188,11 @@ def solveCaptcha():
         if digits == background_digits:
             print('FOUND!')
             pyautogui.mouseUp()
-            return
+            return True
+
+    pyautogui.mouseUp()
+    pyautogui.hotkey('ctrl','f5')
+    return False
 
 if __name__ == '__main__':
     solveCaptcha()

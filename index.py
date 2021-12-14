@@ -7,12 +7,14 @@ from os import listdir
 from src.logger import logger, loggerMapClicked
 from random import randint
 from random import random
+import random as random2
 
 import numpy as np
 import mss
 import pyautogui
 import time
 import sys
+import array
 
 import yaml
 
@@ -54,6 +56,10 @@ if __name__ == '__main__':
 
 ct = c['threshold']
 ch = c['home']
+t = c['time_intervals']
+
+game_instances_count = c['instances']['count']
+game_instances = []
 
 if not ch['enable']:
     print('>>---> Home feature not enabled')
@@ -65,7 +71,6 @@ pyautogui.FAILSAFE = False
 hero_clicks = 0
 login_attempts = 0
 last_log_is_progress = False
-
 
 
 def addRandomness(n, randomn_factor_size=None):
@@ -82,7 +87,7 @@ def addRandomness(n, randomn_factor_size=None):
     return int(randomized_n)
 
 def moveToWithRandomness(x,y,t):
-    pyautogui.moveTo(addRandomness(x,10),addRandomness(y,10),t+random()/2)
+    pyautogui.moveTo(addRandomness(x,10),addRandomness(y,10), round(random2.uniform(0.1, 0.4), 2))
 
 
 def remove_suffix(input_string, suffix):
@@ -134,8 +139,6 @@ robot = cv2.imread('targets/robot.png')
 # piece = cv2.imread('targets/piece.png')
 slider = cv2.imread('targets/slider.png')
 
-
-
 def show(rectangles, img = None):
 
     if img is None:
@@ -151,9 +154,6 @@ def show(rectangles, img = None):
     cv2.waitKey(0)
 
 
-
-
-
 def clickBtn(img,name=None, timeout=3, threshold = ct['default']):
     logger(None, progress_indicator=True)
     if not name is None:
@@ -161,16 +161,17 @@ def clickBtn(img,name=None, timeout=3, threshold = ct['default']):
         # print('waiting for "{}" button, timeout of {}s'.format(name, timeout))
     start = time.time()
     clicked = False
-    while(not clicked):
+    while (not clicked):
         matches = positions(img, threshold=threshold)
-        if(len(matches)==0):
+        if (len(matches) == 0):
             hast_timed_out = time.time()-start > timeout
-            if(hast_timed_out):
+            if (hast_timed_out):
                 if not name is None:
                     pass
                     # print('timed out')
                 return False
             # print('button not found yet')
+            time.sleep(0.05)
             continue
 
         x,y,w,h = matches[0]
@@ -180,6 +181,8 @@ def clickBtn(img,name=None, timeout=3, threshold = ct['default']):
         moveToWithRandomness(pos_click_x,pos_click_y,1)
         pyautogui.click()
         return True
+
+    return False
 
 def printSreen():
     with mss.mss() as sct:
@@ -233,7 +236,7 @@ def clickButtons():
         global hero_clicks
         hero_clicks = hero_clicks + 1
         #cv2.rectangle(sct_img, (x, y) , (x + w, y + h), (0,255,255),2)
-        if hero_clicks > 20:
+        if hero_clicks > (20 * game_instances_count):
             logger('too many hero clicks, try to increase the go_to_work_btn threshold')
             return
     return len(buttons)
@@ -284,7 +287,7 @@ def clickGreenBarButtons():
         pyautogui.click()
         global hero_clicks
         hero_clicks = hero_clicks + 1
-        if hero_clicks > 20:
+        if hero_clicks > (20 * game_instances_count):
             logger('⚠️ Too many hero clicks, try to increase the go_to_work_btn threshold')
             return
         #cv2.rectangle(sct_img, (x, y) , (x + w, y + h), (0,255,255),2)
@@ -318,16 +321,14 @@ def goToHeroes():
 
     solveCaptcha()
     #TODO tirar o sleep quando colocar o pulling
-    time.sleep(1)
-    clickBtn(images['hero-icon'])
-    time.sleep(1)
-    solveCaptcha()
+    
+    return clickBtn(images['hero-icon'])
 
 def goToGame():
     # in case of server overload popup
-    clickBtn(images['x'])
+    clickBtn(images["x"])
     # time.sleep(3)
-    clickBtn(images['x'])
+    clickBtn(images["x"])
 
     clickBtn(images['treasure-hunt-icon'])
 
@@ -344,29 +345,46 @@ def login():
     global login_attempts
     logger('😿 Checking if game has disconnected')
 
-    if login_attempts > 3:
+    if login_attempts > 9:
         logger('🔃 Too many login attempts, refreshing')
         login_attempts = 0
         pyautogui.hotkey('ctrl','f5')
-        return
+        return False
 
-    if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout = 10):
+    if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout = 15):
         solveCaptcha()
         login_attempts = login_attempts + 1
         logger('🎉 Connect wallet button detected, logging in!')
         #TODO mto ele da erro e poco o botao n abre
         # time.sleep(10)
+    else:
+        return False
 
-    if clickBtn(images['select-wallet-2'], name='sign button', timeout=8):
+    if clickBtn(images['select-wallet-2'], name='sign button', timeout=10):
         # sometimes the sign popup appears imediately
         login_attempts = login_attempts + 1
         # print('sign button clicked')
         # print('{} login attempt'.format(login_attempts))
-        if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 15):
+        
+        if clickBtn(images['error']):
+            clickBtn(images['ok'])
+            return login()  
+
+        if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 20):
             # print('sucessfully login, treasure hunt btn clicked')
             login_attempts = 0
-        return
-        # click ok button
+    else:
+        if clickBtn(images["metamask_bar_w10"], threshold=0.9):
+            if clickBtn(images['select-wallet-2'], name='sign button', timeout=10):
+
+                if clickBtn(images['ok']):
+                    return login()
+
+                if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 20):
+                    clickBtn(images['ok'])
+                else:
+                    pyautogui.hotkey('ctrl','f5')
+        
 
     if not clickBtn(images['select-wallet-1-no-hover'], name='selectMetamaskBtn'):
         if clickBtn(images['select-wallet-1-hover'], name='selectMetamaskHoverBtn', threshold  = ct['select_wallet_buttons'] ):
@@ -378,6 +396,7 @@ def login():
         pass
         # print('sleep in case there is no metamask text removed')
         # time.sleep(20)
+        
 
     if clickBtn(images['select-wallet-2'], name='signBtn', timeout = 20):
         login_attempts = login_attempts + 1
@@ -395,7 +414,6 @@ def login():
         # print('ok button clicked')
 
 
-
 def sendHeroesHome():
     if not ch['enable']:
         return
@@ -411,6 +429,7 @@ def sendHeroesHome():
     if n == 0:
         print('No heroes that should be sent home found.')
         return
+
     print(' %d heroes that should be sent home found' % n)
     # if send-home button exists, the hero is not home
     go_home_buttons = positions(images['send-home'], threshold=ch['home_button_threshold'])
@@ -419,10 +438,9 @@ def sendHeroesHome():
 
     for position in heroes_positions:
         if not isHome(position,go_home_buttons):
-            print(isWorking(position, go_work_buttons))
-            if(not isWorking(position, go_work_buttons)):
+            if not isWorking(position, go_work_buttons):
                 print ('hero not working, sending him home')
-                moveToWithRandomness(go_home_buttons[0][0]+go_home_buttons[0][2]/2,position[1]+position[3]/2,1)
+                moveToWithRandomness(go_home_buttons[0][0] + go_home_buttons[0][2] / 2, position[1] + position[3] / 2, 1)
                 pyautogui.click()
             else:
                 print ('hero working, not sending him home(no dark work button)')
@@ -430,13 +448,13 @@ def sendHeroesHome():
             print('hero already home, or home full(no dark home button)')
 
 
-
-
-
 def refreshHeroes():
     logger('🏢 Search for heroes to work')
 
-    goToHeroes()
+    if not goToHeroes():
+        return False
+
+    solveCaptcha()
 
     if c['select_heroes_mode'] == "full":
         logger('⚒️ Sending heroes with full stamina bar to work', 'green')
@@ -445,77 +463,124 @@ def refreshHeroes():
     else:
         logger('⚒️ Sending all heroes to work', 'green')
 
-    buttonsClicked = 1
-    empty_scrolls_attempts = c['scroll_attemps']
-
-    while(empty_scrolls_attempts >0):
+    for i in [0, 1, 2, 3, 4]:
         if c['select_heroes_mode'] == 'full':
-            buttonsClicked = clickFullBarButtons()
+            clickFullBarButtons()
         elif c['select_heroes_mode'] == 'green':
-            buttonsClicked = clickGreenBarButtons()
+            clickGreenBarButtons()
         else:
-            buttonsClicked = clickButtons()
+            clickButtons()
 
         sendHeroesHome()
-
-        if buttonsClicked == 0:
-            empty_scrolls_attempts = empty_scrolls_attempts - 1
-        scroll()
-        time.sleep(2)
-    logger('💪 {} heroes sent to work'.format(hero_clicks))
-    goToGame()
-
-
-def main():
-    time.sleep(5)
-    t = c['time_intervals']
-
-    last = {
-    "login" : 0,
-    "heroes" : 0,
-    "new_map" : 0,
-    "check_for_captcha" : 0,
-    "refresh_heroes" : 0
-    }
-
-    while True:
-        now = time.time()
-
-        if now - last["check_for_captcha"] > addRandomness(t['check_for_captcha'] * 60):
-            last["check_for_captcha"] = now
-            solveCaptcha()
-
-        if now - last["heroes"] > addRandomness(t['send_heroes_for_work'] * 60):
-            last["heroes"] = now
-            refreshHeroes()
-
-        if now - last["login"] > addRandomness(t['check_for_login'] * 60):
-            sys.stdout.flush()
-            last["login"] = now
-            login()
-
-        if now - last["new_map"] > t['check_for_new_map_button']:
-            last["new_map"] = now
-
-            if clickBtn(images['new-map']):
-                loggerMapClicked()
-
-
-        if now - last["refresh_heroes"] > addRandomness( t['refresh_heroes_positions'] * 60):
-            solveCaptcha()
-            last["refresh_heroes"] = now
-            refreshHeroesPositions()
-
-        #clickBtn(teasureHunt)
-        logger(None, progress_indicator=True)
-
-        sys.stdout.flush()
+        if i < 3:
+            scroll()
 
         time.sleep(1)
 
+    logger('💪 {} heroes sent to work'.format(hero_clicks))
+    goToGame()
+    return True
 
+def checks(reset=False):
 
-main()
+    if reset is True or clickBtn(images["error"], timeout=0.05):
+        pyautogui.hotkey("ctrl", "F5")
+        time.sleep(10)
+        return
+
+    clickBtn(images["ok"], timeout=0.05)
+    clickBtn(images["x"], timeout=0.05)
+    clickBtn(images["x-2"], timeout=0.05)
+    clickBtn(images["arrow-down"], timeout=0.05)
+    clickBtn(images['treasure-hunt-icon'], timeout=0.05)
+    solveCaptcha()
+    clickBtn(images["ok"], timeout=0.05)
+    clickBtn(images["x"], timeout=0.05)
+    clickBtn(images["x-2"], timeout=0.05)
+    clickBtn(images["arrow-down"], timeout=0.05)
+    clickBtn(images['treasure-hunt-icon'], timeout=0.05)
+
+def main():
+    time.sleep(5)
+
+    for i in range(0, game_instances_count):
+        game_instances.append({
+            "login" : 0,
+            "heroes" : 0,
+            "new_map" : 0,
+            "check_for_captcha" : 0,
+            "refresh_heroes" : 0,
+            "index": i + 1
+        })
+    
+    while True:
+        now = time.time()
+
+        for i in range(0, game_instances_count):
+
+            checks()
+
+            if now - game_instances[i]["login"] > t['check_for_login'] * 60:
+                sys.stdout.flush()
+                game_instances[i]["login"] = now
+                login()        
+
+            if now - game_instances[i]["new_map"] > t['check_for_new_map_button']:
+                game_instances[i]["new_map"] = now
+
+                if clickBtn(images['new-map']):
+                    game_instances[i]["refresh_heroes"] = now
+                    loggerMapClicked()
+
+            if now - game_instances[i]["heroes"] > t['send_heroes_for_work'] * 60:
+                if refreshHeroes():
+                    game_instances[i]["heroes"] = now
+                    game_instances[i]["refresh_heroes"] = now
+                else:
+                    pyautogui.hotkey("ctrl", "F5")
+        
+            if now - game_instances[i]["refresh_heroes"] > t['refresh_heroes_positions'] * 60:
+                solveCaptcha()
+                game_instances[i]["refresh_heroes"] = now
+                refreshHeroesPositions()
+
+            #clickBtn(teasureHunt)
+            logger(None, progress_indicator=True)
+
+            sys.stdout.flush()
+            
+            if game_instances_count > 1:
+                logger("Changing to " + str(game_instances[i]['index']) + " BombCrypto instance.")
+
+                pyautogui.keyDown('alt')
+                aux = game_instances_count
+                while aux > 1:
+                    pyautogui.press('tab')
+                    aux = aux - 1
+                    time.sleep(0.05)                    
+                pyautogui.keyUp('alt')
+            else:
+                time.sleep(1)
+
+exceptions = 100
+
+def mainLoop():
+    try:
+        main()
+    except Exception as error:
+        
+        logger(error, color="red")
+        global exceptions
+        exceptions = exceptions - 1
+
+        if exceptions > 0:
+            pyautogui.hotkey('ctrl','f5')
+            time.sleep(60)
+            mainLoop()
+
+if __name__ == '__main__':
+    mainLoop()
+
 # sendHeroesHome()
 
 

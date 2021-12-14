@@ -1,5 +1,13 @@
 ---
 
+  instances:
+    # [en_US] Quantity of game instances in different web browsers
+    # Default value: 1
+    #
+    # [pt_BR] Quantidade de instancias de BombCrypto em navegadores diferentes
+    # Valor padrão: 1
+    count: 1
+
   # [en_US] Time intervals configuration
   #
   # [pt_BR] Configurações de intervalos de tempo
@@ -10,7 +18,7 @@
     #
     # [pt_BR] Intervalo de tempo para verificar se há heróis disponíveis para trabalhar
     # Valor padrão (em minutos): 10
-    send_heroes_for_work: 10
+    send_heroes_for_work: 30
     
     # [en_US] Time interval to update heroes position in the map,
     # Default value (in minutes): 3
@@ -38,7 +46,7 @@
     #
     # [pt_BR] Intervalo de tempo para verificar se existe solicitação de login
     # Valor padrão (em minutos): 5
-    check_for_login: 5
+    check_for_login: 3
 
     # [en_US] Time interval between moviments
     # Default value (in seconds): 1 
