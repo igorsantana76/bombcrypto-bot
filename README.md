@@ -2,14 +2,20 @@
 Feito com a ajuda do gradissíssimo [Nucito](https://github.com/Nucito/CaptchaSolver)!
 ## Não se esqueça de mandar aquele apoio, vamos continuar na luta!
 
-Certifique-se que você está usando a versão 3.9.X do Python
+- Certifique-se que você está usando a versão 3.9.X do Python
   `python -V`
-Atualize o PIP
-  `python -m pip install --upgrade pip`
-Baixe novamente todos os arquivos.
-Rode novamente o comando.
-  `pip install -r requirements.txt`
+- Atualize o PIP
+- `python -m pip install --upgrade pip`
+- Baixe novamente todos os arquivos
+- Rode novamente o comando
+- `pip install -r requirements.txt`
+- No terminal executa `python index.py`
   
+
+## Multi bombs abertos no mesmo PC
+### Ao executar o script clique em todos os navegadores com BombCrypto, pois o bot irá intercalar entre as abas abertas afim de executar em todas.
+### Propriedade no config.yaml: instances > count
+
 Lucre!
 
 # New captcha implemented!!
