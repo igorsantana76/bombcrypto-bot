@@ -133,7 +133,7 @@ def getSliderPositions(screenshot, popup_pos):
 
     if slider is None:
         print('no slider')
-        exit()
+        return None
     (start_x, start_y) = slider
 
     pyautogui.moveTo(start_x,start_y+randint(0,10),1)
@@ -174,6 +174,9 @@ def solveCaptcha():
     img = captchaImg(img, popup_pos[0])
     digits = getDigits(d, img)
     slider_positions = getSliderPositions(screenshot, popup_pos)
+
+    if slider_positions is None:
+        return
     # moveSlider(screenshot,3,popup_pos)
 
     for position in slider_positions:
@@ -184,7 +187,7 @@ def solveCaptcha():
         captcha_img = captchaImg(screenshot, popup_pos[0])
         # captcha_img = example_captcha_img
         background_digits = getBackgroundText(captcha_img,  0.7)
-        print( 'dig: {}, background_digits: {}'.format(digits, background_digits))
+        # print( 'dig: {}, background_digits: {}'.format(digits, background_digits))
         if digits == background_digits:
             print('FOUND!')
             pyautogui.mouseUp()
