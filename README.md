@@ -2,6 +2,10 @@
 Feito com a ajuda do gradissíssimo [Nucito](https://github.com/Nucito/CaptchaSolver)!
 ## Não se esqueça de mandar aquele apoio, vamos continuar na luta!
 
+Certifique-se que você está usando a versão 3.9.X do Python
+  `python -V`
+Atualize o PIP
+  `python -m pip install --upgrade pip`
 Baixe novamente todos os arquivos.
 Rode novamente o comando.
   `pip install -r requirements.txt`
@@ -19,11 +23,6 @@ Profit!
 
 ### Smart Chain Wallet:
 #### 0xbd06182D8360FB7AC1B05e871e56c76372510dDf
-
-
-
-Rode novamente o comando.
-  `pip install -r requirements.txt`
   
 # Sobre:
 Este bot tem o seu código aberto, de forma que qualquer pessoa pode vê-lo, fazer uma fork, ou updates.
@@ -40,7 +39,7 @@ ser financiado coletivamente. Atualmente eu atualizarei a barra das metas
 manualmente de forma diária, talvez no futuro eu automatize o processo de
 alguma forma.
 
-- 1 - Diariamente passar um tempo respondendo os issues, organizando o
+- [X] 1 - Diariamente passar um tempo respondendo os issues, organizando o
 repositório e revisando pull requests.
 
 - [x] 2 - Um tutorial de como identificar e resolver os problemas mais comuns no
@@ -81,10 +80,9 @@ https://www.paypal.com/donate?hosted_button_id=JVYSC6ZYCNQQQ
 #### Os desenvolvedores do jogo se pronunciaram e agora o uso de auto clickers e o uso de bots é oficialmente PROIBIDO.  Não me responsabilizo por eventuais penalidades sofridas por quem usar o bot, use por sua própria conta e risco.
 
 # Instalação:
-### Baixe e instale o Python pelo [site](https://www.python.org/downloads/) ou pela [windows store](https://www.microsoft.com/p/python-37/9nj46sx7x90p?activetab=pivot:overviewtab).
+### Baixe e instale o Python 3.9.() pelo [site](https://www.python.org/downloads/).
 
-Se você baixar pelo site é importante marcar a opção para adicionar o
-python ao PATH:
+Se você baixar pelo site é importante marcar a opção para adicionar o python ao PATH:
 ![Check Add python to PATH](https://github.com/mpcabete/bombcrypto-bot/raw/ee1b3890e67bc30e372359db9ae3feebc9c928d8/readme-images/path.png)
 
 ### Realize o download do codigo no formato zip, e extraia o arquivo.
