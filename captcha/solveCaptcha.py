@@ -283,7 +283,7 @@ def solveCaptcha():
         captcha_img = smallDigitsImg(screenshot, popup_pos[0])
         small_digits = getSmallDigits(captcha_img)
         # print( 'dig: {}, background_digits: {}'.format(digits, background_digits))
-        if small_digits == background_digits or small_digits in background_digits or (small_digits[0] == background_digits[0] and small_digits[1] == background_digits[1]):
+        if small_digits == background_digits or small_digits in background_digits or background_digits in small_digits or (small_digits[0] == background_digits[0] and small_digits[1] == background_digits[1]):
             print('FOUND!')
             pyautogui.mouseUp()
             return

@@ -507,7 +507,7 @@ def checks(reset=False):
     clickBtn(images['treasure-hunt-icon'], timeout=0.05)
 
 def main():
-    #time.sleep(5)
+    time.sleep(5)
 
     for i in range(0, game_instances_count):
         game_instances.append({
