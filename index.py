@@ -351,7 +351,7 @@ def login():
         logger('🔃 Too many login attempts, refreshing')
         login_attempts = 0
         #pyautogui.hotkey('ctrl','f5')
-        return False
+        #return False
 
     if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout = 15):
         solveCaptcha()
@@ -359,10 +359,8 @@ def login():
         logger('🎉 Connect wallet button detected, logging in!')
         #TODO mto ele da erro e poco o botao n abre
         # time.sleep(10)
-    else:
-        return False
 
-    if clickBtn(images['select-wallet-2'], name='sign button', timeout=10):
+    if clickBtn(images['select-wallet-2'], name='sign button', timeout=15):
         # sometimes the sign popup appears imediately
         login_attempts = login_attempts + 1
         # print('sign button clicked')
@@ -370,23 +368,26 @@ def login():
         
         if clickBtn(images['error']):
             clickBtn(images['ok'])
-            return login()  
+            return False
 
-        if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 20):
+        if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 60):
             # print('sucessfully login, treasure hunt btn clicked')
             login_attempts = 0
+            return True
+        else:
+            return False
     else:
         if clickBtn(images["metamask_bar"], threshold=0.9):
             if clickBtn(images['select-wallet-2'], name='sign button', timeout=10):
 
                 if clickBtn(images['ok']):
-                    return login()
-
-                if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 20):
-                    clickBtn(images['ok'])
-                else:
                     pass
-                    #pyautogui.hotkey('ctrl','f5')
+
+                if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 60):
+                    if not clickBtn(images['ok']):
+                        return True
+                else:
+                    return False
         
 
     if not clickBtn(images['select-wallet-1-no-hover'], name='selectMetamaskBtn'):
@@ -526,8 +527,10 @@ def main():
 
             if now - game_instances[i]["login"] > t['check_for_login'] * 60:
                 sys.stdout.flush()
-                game_instances[i]["login"] = now
-                login()        
+                if login() is not False:
+                    game_instances[i]["login"] = now
+                else:
+                    pyautogui.hotkey('ctrl','f5')                        
 
             if now - game_instances[i]["new_map"] > t['check_for_new_map_button']:
                 game_instances[i]["new_map"] = now

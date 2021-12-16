@@ -147,7 +147,7 @@ def getSliderPositions(screenshot, popup_pos):
     increment = size/5
 
     positions = []
-    for i in range(5):
+    for i in range(9):
         # pyautogui.moveTo(start_x+increment*pos ,start_y+randint(0,10),1)
         positions.append((start_x+increment*i ,start_y+randint(0,10)))
         # screenshot = printSreen()
