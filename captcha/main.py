@@ -183,7 +183,7 @@ def main():
         popup_pos = positions(d['robot'],img=img)
         if len(popup_pos) == 0:
             print('fail to open')
-            pyautogui.hotkey('ctrl','f5')
+            #pyautogui.hotkey('ctrl','f5')
             time.sleep(7)
             return
             # exit()
@@ -211,7 +211,7 @@ def main():
         for choice in choice_screenshots:
             save('success/'+awnser,choice)
         pyautogui.click()
-        pyautogui.hotkey('ctrl','f5')
+        #pyautogui.hotkey('ctrl','f5')
         time.sleep(7)
         # save in success and refresh
     if o == 'timeout':

@@ -155,6 +155,7 @@ def show(rectangles, img = None):
 
 
 def clickBtn(img,name=None, timeout=3, threshold = ct['default']):
+
     logger(None, progress_indicator=True)
     if not name is None:
         pass
@@ -197,6 +198,8 @@ def printSreen():
 def positions(target, threshold=ct['default'],img = None):
     if img is None:
         img = printSreen()
+
+    
     result = cv2.matchTemplate(img,target,cv2.TM_CCOEFF_NORMED)
     w = target.shape[1]
     h = target.shape[0]
@@ -214,7 +217,7 @@ def positions(target, threshold=ct['default'],img = None):
 
 def scroll():
 
-    commoms = positions(images['commom-text'], threshold = ct['commom'])
+    commoms = positions(images['common-text'], threshold = ct['commom'])
     if (len(commoms) == 0):
         return
     x,y,w,h = commoms[len(commoms)-1]
@@ -270,7 +273,6 @@ def clickGreenBarButtons():
     logger('🟩 %d green bars detected' % len(green_bars))
     buttons = positions(images['go-work'], threshold=ct['go_to_work_btn'])
     logger('🆗 %d buttons detected' % len(buttons))
-
 
     not_working_green_bars = []
     for bar in green_bars:
@@ -348,7 +350,7 @@ def login():
     if login_attempts > 9:
         logger('🔃 Too many login attempts, refreshing')
         login_attempts = 0
-        pyautogui.hotkey('ctrl','f5')
+        #pyautogui.hotkey('ctrl','f5')
         return False
 
     if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout = 15):
@@ -374,7 +376,7 @@ def login():
             # print('sucessfully login, treasure hunt btn clicked')
             login_attempts = 0
     else:
-        if clickBtn(images["metamask_bar_w10"], threshold=0.9):
+        if clickBtn(images["metamask_bar"], threshold=0.9):
             if clickBtn(images['select-wallet-2'], name='sign button', timeout=10):
 
                 if clickBtn(images['ok']):
@@ -383,7 +385,8 @@ def login():
                 if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout = 20):
                     clickBtn(images['ok'])
                 else:
-                    pyautogui.hotkey('ctrl','f5')
+                    pass
+                    #pyautogui.hotkey('ctrl','f5')
         
 
     if not clickBtn(images['select-wallet-1-no-hover'], name='selectMetamaskBtn'):
@@ -463,7 +466,9 @@ def refreshHeroes():
     else:
         logger('⚒️ Sending all heroes to work', 'green')
 
-    for i in [0, 1, 2, 3, 4]:
+    clickBtn(images['common-text'], timeout=30)
+
+    for i in range(0, 5):
         if c['select_heroes_mode'] == 'full':
             clickFullBarButtons()
         elif c['select_heroes_mode'] == 'green':
@@ -472,6 +477,7 @@ def refreshHeroes():
             clickButtons()
 
         sendHeroesHome()
+
         if i < 3:
             scroll()
 
@@ -484,7 +490,7 @@ def refreshHeroes():
 def checks(reset=False):
 
     if reset is True or clickBtn(images["error"], timeout=0.05):
-        pyautogui.hotkey("ctrl", "F5")
+        #pyautogui.hotkey("ctrl", "F5")
         time.sleep(10)
         return
 
@@ -501,7 +507,7 @@ def checks(reset=False):
     clickBtn(images['treasure-hunt-icon'], timeout=0.05)
 
 def main():
-    time.sleep(5)
+    #time.sleep(5)
 
     for i in range(0, game_instances_count):
         game_instances.append({
@@ -517,8 +523,6 @@ def main():
         now = time.time()
 
         for i in range(0, game_instances_count):
-
-            checks()
 
             if now - game_instances[i]["login"] > t['check_for_login'] * 60:
                 sys.stdout.flush()
@@ -537,12 +541,15 @@ def main():
                     game_instances[i]["heroes"] = now
                     game_instances[i]["refresh_heroes"] = now
                 else:
-                    pyautogui.hotkey("ctrl", "F5")
+                    pass
+                    #pyautogui.hotkey("ctrl", "F5")
         
             if now - game_instances[i]["refresh_heroes"] > t['refresh_heroes_positions'] * 60:
                 solveCaptcha()
                 game_instances[i]["refresh_heroes"] = now
                 refreshHeroesPositions()
+
+            checks()
 
             #clickBtn(teasureHunt)
             logger(None, progress_indicator=True)
@@ -560,7 +567,7 @@ def main():
                     time.sleep(0.05)                    
                 pyautogui.keyUp('alt')
             else:
-                time.sleep(1)
+                time.sleep(60)
 
 exceptions = 100
 
@@ -574,8 +581,8 @@ def mainLoop():
         exceptions = exceptions - 1
 
         if exceptions > 0:
-            pyautogui.hotkey('ctrl','f5')
-            time.sleep(60)
+            #pyautogui.hotkey('ctrl','f5')
+            #time.sleep(60)
             mainLoop()
 
 if __name__ == '__main__':

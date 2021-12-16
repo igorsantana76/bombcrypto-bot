@@ -1,34 +1,21 @@
-# Novo captcha implementado!!!
-Feito com a ajuda do gradissíssimo [Nucito](https://github.com/Nucito/CaptchaSolver)!
-## Não se esqueça de mandar aquele apoio, vamos continuar na luta!
+# New captcha update:
+## Quase lá!
+## Almost there!
 
-- Certifique-se que você está usando a versão 3.9.X do Python
-  `python -V`
-- Atualize o PIP
-- `python -m pip install --upgrade pip`
-- Baixe novamente todos os arquivos
-- Rode novamente o comando
-- `pip install -r requirements.txt`
-- No terminal executa `python index.py`
+### Temos a primeira versão "funcional" do bot, ainda existem algumas otimizaçoes que precisam ser feitas pra ele funcionar liso, se quiser esperar, esssa atualizaçao deve sair hj ainda.
+### The first functional version is ready! There are still some optimizations that need to be implemented for it to work smoothly. If you are willing to wait for a little bit, the update should come later today.
   
 
-## Multi bombs abertos no mesmo PC
-### Ao executar o script clique em todos os navegadores com BombCrypto, pois o bot irá intercalar entre as abas abertas afim de executar em todas.
-### Propriedade no config.yaml: instances > count
-
-Lucre!
-
-# New captcha implemented!!
-## Don't forget to send me some love 🧡
-
-Download tha files again.
-Run again the command:
-  `pip install -r requirements.txt`
-  
-Profit!
+## Faz a boa pra nois
+## Do the good
 
 ### Smart Chain Wallet:
 #### 0xbd06182D8360FB7AC1B05e871e56c76372510dDf
+
+### PIX:
+  6ce2b79e-97be-4881-a882-81902e29d7ce
+![pix](https://github.com/mpcabete/bombcrypto-bot/raw/main/readme-images/pix.jpeg)
+
   
 # Sobre:
 Este bot tem o seu código aberto, de forma que qualquer pessoa pode vê-lo, fazer uma fork, ou updates.
@@ -45,37 +32,7 @@ ser financiado coletivamente. Atualmente eu atualizarei a barra das metas
 manualmente de forma diária, talvez no futuro eu automatize o processo de
 alguma forma.
 
-- [X] 1 - Diariamente passar um tempo respondendo os issues, organizando o
-repositório e revisando pull requests.
-
-- [x] 2 - Um tutorial de como identificar e resolver os problemas mais comuns no
-bot, talvez com um diagrama de fluxo.
-
-- [ ] 3 - Um tutorial de como hostear o bot em um computador virtual usando o plano
-de testes de 3 meses da google cloud.
-
-- [x] 4 - Terminar de implementar e fazer a manutenção e os ajustes necessários na
-função de enviar os heróis para casa.
-
-- [x] 5 - Inserir um valor aleatório em todos os movimentos e os intervalos de
-espera do bot para dificultar ainda mais sua detecção.
-
-- [ ] 6 - Arrumar e ajustar os problemas que tem ocorrido durante o processo de
-login.
-
-- [ ] 7 - Trabalhar com o pessoal para arrumar os erros que ocorrem quando o bot é
-usado em um setup windows com dois monitores.
-
-
-``` 
-             1(15%)        2,3(30%)     4(40%)               5(60%)          6(75%)     7(85%)
-[xxxxxxxxxxxxxx|xxxxxxxxxxxxxxxx|xxxxxxxxxx|xxxxxxxxxxxxxxxxxxxx|xxxxxxxxxxxxxxx|xxxxxxxxxx|xxxxxxxxxxxxxxx] (500$)
-                                                                                                           |
-                                                                                                          500$
-```
  
-### Smart Chain Wallet:
-#### 0xbd06182D8360FB7AC1B05e871e56c76372510dDf
 
 ### Paypal:
 [Donate:](https://www.paypal.com/donate?hosted_button_id=JVYSC6ZYCNQQQ)
@@ -86,9 +43,10 @@ https://www.paypal.com/donate?hosted_button_id=JVYSC6ZYCNQQQ
 #### Os desenvolvedores do jogo se pronunciaram e agora o uso de auto clickers e o uso de bots é oficialmente PROIBIDO.  Não me responsabilizo por eventuais penalidades sofridas por quem usar o bot, use por sua própria conta e risco.
 
 # Instalação:
-### Baixe e instale o Python 3.9.() pelo [site](https://www.python.org/downloads/).
+### Baixe e instale o Python pelo [site](https://www.python.org/downloads/) ou pela [windows store](https://www.microsoft.com/p/python-37/9nj46sx7x90p?activetab=pivot:overviewtab).
 
-Se você baixar pelo site é importante marcar a opção para adicionar o python ao PATH:
+Se você baixar pelo site é importante marcar a opção para adicionar o
+python ao PATH:
 ![Check Add python to PATH](https://github.com/mpcabete/bombcrypto-bot/raw/ee1b3890e67bc30e372359db9ae3feebc9c928d8/readme-images/path.png)
 
 ### Realize o download do codigo no formato zip, e extraia o arquivo.
