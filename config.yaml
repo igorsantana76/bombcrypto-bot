@@ -6,7 +6,7 @@
     #
     # [pt_BR] Quantidade de instancias de BombCrypto em navegadores diferentes
     # Valor padrão: 1
-    count: 3
+    count: 1
 
   # [en_US] Time intervals configuration
   #
