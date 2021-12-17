@@ -227,7 +227,7 @@ def scroll():
     if not c['use_click_and_drag_instead_of_scroll']:
         pyautogui.scroll(-c['scroll_size'])
     else:
-        pyautogui.dragRel(0,-c['click_and_drag_amount'],duration=1, button='left')
+        pyautogui.dragRel(0,-c['click_and_drag_amount'],duration=0.5, button='left')
 
 
 def clickButtons():
@@ -320,9 +320,6 @@ def goToHeroes():
     if clickBtn(images['go-back-arrow']):
         global login_attempts
         login_attempts = 0
-
-    solveCaptcha()
-    #TODO tirar o sleep quando colocar o pulling
     
     return clickBtn(images['hero-icon'])
 
@@ -343,7 +340,12 @@ def refreshHeroesPositions():
     # time.sleep(3)
     clickBtn(images['treasure-hunt-icon'])
 
-def login():
+def login(try_captcha_until_login = False):
+
+    tries = 2
+    if try_captcha_until_login:
+        tries = 50
+
     global login_attempts
     logger('😿 Checking if game has disconnected')
 
@@ -354,7 +356,7 @@ def login():
         #return False
 
     if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout = 15):
-        solveCaptcha()
+        solveCaptcha(tries)
         login_attempts = login_attempts + 1
         logger('🎉 Connect wallet button detected, logging in!')
         #TODO mto ele da erro e poco o botao n abre
@@ -458,7 +460,8 @@ def refreshHeroes():
     if not goToHeroes():
         return False
 
-    solveCaptcha()
+    if solveCaptcha() == True:
+        time.sleep(10)
 
     if c['select_heroes_mode'] == "full":
         logger('⚒️ Sending heroes with full stamina bar to work', 'green')
@@ -467,7 +470,7 @@ def refreshHeroes():
     else:
         logger('⚒️ Sending all heroes to work', 'green')
 
-    clickBtn(images['common-text'], timeout=30)
+    clickBtn(images['common-text'], timeout=5)
 
     for i in range(0, 5):
         if c['select_heroes_mode'] == 'full':
@@ -527,7 +530,7 @@ def main():
 
             if now - game_instances[i]["login"] > t['check_for_login'] * 60:
                 sys.stdout.flush()
-                if login() is not False:
+                if login(game_instances_count == 1) is not False:
                     game_instances[i]["login"] = now
                 else:
                     pyautogui.hotkey('ctrl','f5')                        

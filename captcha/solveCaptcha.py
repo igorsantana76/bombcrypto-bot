@@ -278,7 +278,11 @@ def getSmallDigits(img):
     return digits
 
 
-def solveCaptcha():
+def solveCaptcha(tries=2):
+
+    if tries == 0:
+        return
+
     screenshot = printSreen()
     img = screenshot.copy()
     popup_pos = positions(d['robot'], img=img)
@@ -305,12 +309,12 @@ def solveCaptcha():
         if small_digits == background_digits or small_digits in background_digits or background_digits in small_digits or (small_digits[0] == background_digits[0] and small_digits[1] == background_digits[1]):
             print('FOUND!')
             pyautogui.mouseUp()
-            return
+            return True
 
     print('not found... trying again!')
     pyautogui.mouseUp()
-    # solveCaptcha()
-    return
+    return solveCaptcha(tries - 1)
+    
 
 
 if __name__ == '__main__':
