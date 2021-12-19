@@ -239,7 +239,7 @@ def clickButtons():
         global hero_clicks
         hero_clicks = hero_clicks + 1
         #cv2.rectangle(sct_img, (x, y) , (x + w, y + h), (0,255,255),2)
-        if hero_clicks > (20 * game_instances_count):
+        if hero_clicks > 20:
             logger('too many hero clicks, try to increase the go_to_work_btn threshold')
             return
     return len(buttons)
@@ -289,8 +289,9 @@ def clickGreenBarButtons():
         pyautogui.click()
         global hero_clicks
         hero_clicks = hero_clicks + 1
-        if hero_clicks > (20 * game_instances_count):
-            logger('⚠️ Too many hero clicks, try to increase the go_to_work_btn threshold')
+        
+        if hero_clicks > 20:
+            logger('too many hero clicks, try to increase the go_to_work_btn threshold')
             return
         #cv2.rectangle(sct_img, (x, y) , (x + w, y + h), (0,255,255),2)
     return len(not_working_green_bars)
@@ -325,10 +326,8 @@ def goToHeroes():
 
 def goToGame():
     # in case of server overload popup
-    clickBtn(images["x"])
-    # time.sleep(3)
-    clickBtn(images["x"])
-
+    clickBtn(images["x"], timeout=1)
+    clickBtn(images["x"], timeout=1)
     clickBtn(images['treasure-hunt-icon'])
 
 def refreshHeroesPositions():
@@ -340,11 +339,7 @@ def refreshHeroesPositions():
     # time.sleep(3)
     clickBtn(images['treasure-hunt-icon'])
 
-def login(try_captcha_until_login = False):
-
-    tries = 2
-    if try_captcha_until_login:
-        tries = 50
+def login():
 
     global login_attempts
     logger('😿 Checking if game has disconnected')
@@ -356,7 +351,7 @@ def login(try_captcha_until_login = False):
         #return False
 
     if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout = 15):
-        solveCaptcha(tries)
+        solveCaptcha()
         login_attempts = login_attempts + 1
         logger('🎉 Connect wallet button detected, logging in!')
         #TODO mto ele da erro e poco o botao n abre
@@ -457,6 +452,9 @@ def sendHeroesHome():
 def refreshHeroes():
     logger('🏢 Search for heroes to work')
 
+    global hero_clicks
+    hero_clicks = 0
+
     if not goToHeroes():
         return False
 
@@ -530,15 +528,15 @@ def main():
 
             if now - game_instances[i]["login"] > t['check_for_login'] * 60:
                 sys.stdout.flush()
-                if login(game_instances_count == 1) is not False:
+                if login() is not False:
                     game_instances[i]["login"] = now
                 else:
-                    pyautogui.hotkey('ctrl','f5')                        
+                    pyautogui.hotkey('ctrl','F5')                     
 
             if now - game_instances[i]["new_map"] > t['check_for_new_map_button']:
-                game_instances[i]["new_map"] = now
 
                 if clickBtn(images['new-map']):
+                    game_instances[i]["new_map"] = now
                     game_instances[i]["refresh_heroes"] = now
                     loggerMapClicked()
 
@@ -547,17 +545,14 @@ def main():
                     game_instances[i]["heroes"] = now
                     game_instances[i]["refresh_heroes"] = now
                 else:
-                    pass
-                    #pyautogui.hotkey("ctrl", "F5")
+                    pyautogui.hotkey("ctrl", "F5")
         
             if now - game_instances[i]["refresh_heroes"] > t['refresh_heroes_positions'] * 60:
-                solveCaptcha()
                 game_instances[i]["refresh_heroes"] = now
                 refreshHeroesPositions()
 
             checks()
-
-            #clickBtn(teasureHunt)
+            
             logger(None, progress_indicator=True)
 
             sys.stdout.flush()
