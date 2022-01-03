@@ -319,7 +319,8 @@ def lookForMatch(background_digits, popup_pos, has_found):
 
 
 def solveCaptcha(tries=2):
-
+    return
+    
     tries = tries - 1
     screenshot = printSreen()
     img = screenshot.copy()
