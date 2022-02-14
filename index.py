@@ -228,7 +228,7 @@ def scroll():
         pyautogui.scroll(-c['scroll_size'])
     else:
         pyautogui.dragRel(0, -c['click_and_drag_amount'],
-                          duration=0.75, button='left')
+                          duration=0.70, button='left')
 
 
 def clickButtons():
@@ -353,9 +353,13 @@ def refreshHeroesPositions():
     clickBtn(images['treasure-hunt-icon'])
 
 def gameIsOpen():
-    return (not len(positions(images['go-back-arrow'])) == 0) or (not len(positions(images['treasure-hunt-icon'])) == 0) or (not len(positions(images['x-2'])) == 0)
+    return (not len(positions(images['go-back-arrow'])) == 0) or (not len(positions(images['treasure-hunt-icon'])) == 0) or (not len(positions(images['x-2'])) == 0) or (not len(positions(images['new-map'])) == 0)
 
-def login(cleanCache = True):
+def acceptLoginTerms():
+    clickBtn(images['terms'])
+    clickBtn(images['accept'])
+
+def login(refresh = False):
 
     global login_attempts
     logger('😿 Checking if game has disconnected')
@@ -366,15 +370,13 @@ def login(cleanCache = True):
         # pyautogui.hotkey('ctrl','f5')
         # return False
 
-    if cleanCache == True:
+    if refresh:
         pyautogui.hotkey("ctrl", "F5")
-    else:
-        pyautogui.hotkey("F5")
+        time.sleep(10)
 
-    time.sleep(5)
+    acceptLoginTerms()
 
     if clickBtn(images['connect-wallet'], name='connectWalletBtn', timeout=30):
-        solveCaptcha()
         login_attempts = login_attempts + 1
         logger('🎉 Connect wallet button detected, logging in!')
         # TODO mto ele da erro e poco o botao n abre
@@ -389,7 +391,7 @@ def login(cleanCache = True):
             if clickBtn(images['error']) and clickBtn(images['ok']):
                 return False
 
-            if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout=30):
+            if clickBtn(images['treasure-hunt-icon'], name='teasureHunt', timeout=60):
                 # print('sucessfully login, treasure hunt btn clicked')
                 login_attempts = 0
                 return True
@@ -507,6 +509,9 @@ def refreshHeroes():
     if not isHeroesTabOpen():
         return False
 
+    clickBtn(images['all-rest'], timeout=0.05)
+    time.sleep(2.5)
+
     if c['select_heroes_mode'] == "full":
         logger('⚒️ Sending heroes with full stamina bar to work', 'green')
     elif c['select_heroes_mode'] == "green":
@@ -528,7 +533,7 @@ def refreshHeroes():
         if i < 3:
             scroll()
 
-        time.sleep(2.5)
+        time.sleep(2.75)
 
     logger('💪 {} heroes sent to work'.format(hero_clicks))
     goToGame()
@@ -539,14 +544,16 @@ def checks(reset=False):
 
     if reset is True or clickBtn(images["error"], timeout=0.05):
         pyautogui.hotkey("ctrl", "F5")
-        time.sleep(10)
+        time.sleep(15)
         return
 
+    clickBtn(images['new-map'], timeout=0.05)
     clickBtn(images["ok"], timeout=0.05)
     clickBtn(images["x"], timeout=0.05)
     clickBtn(images["x-2"], timeout=0.05)
     clickBtn(images["arrow-down"], timeout=0.05)
     clickBtn(images['treasure-hunt-icon'], timeout=0.05)
+    clickBtn(images['new-map'], timeout=0.05)
     clickBtn(images["ok"], timeout=0.05)
     clickBtn(images["x"], timeout=0.05)
     clickBtn(images["x-2"], timeout=0.05)
@@ -571,22 +578,25 @@ def main():
 
         for i in range(0, game_instances_count):
 
+            checks()
+
             any_action_taken = False
             logged_in = False
 
             if gameIsOpen():
                 logged_in = True
 
-            if not logged_in and login() != False:
+            if not logged_in and login(True) != False:
                 logged_in = True
+                any_action_taken = True
                 sys.stdout.flush()
 
             if logged_in == True:
+                
                 if now - game_instances[i]["heroes"] > t['send_heroes_for_work'] * 60:
 
-                    if game_instances[i]["refresh_heroes_count"] > 0:
-                        sendHeroesToRest()
-                        login(False)
+                    if game_instances[i]["refresh_heroes_count"] > 5:
+                        game_instances[i]["refresh_heroes_count"] = 0
 
                     if refreshHeroes():
                         game_instances[i]["heroes"] = now
@@ -598,28 +608,25 @@ def main():
 
                 if now - game_instances[i]["refresh_heroes"] > t['refresh_heroes_positions'] * 60:
                     game_instances[i]["refresh_heroes"] = now
+                    any_action_taken = True
                     refreshHeroesPositions()
-                                
-
-            checks()
-            logger(None, progress_indicator=True)
 
             sys.stdout.flush()
 
-            if game_instances_count > 1:
-                logger("Changing to " +
-                       str(game_instances[i]['index']) + " BombCrypto instance.")
-            
-                pyautogui.keyDown('alt')
-                aux = game_instances_count
-                while aux > 1:
-                    pyautogui.press('tab')
-                    aux = aux - 1
-                    time.sleep(0.1)
-                pyautogui.keyUp('alt')
-            
             if any_action_taken is False or game_instances_count == 1:
-                time.sleep(60 / game_instances_count)
+                time.sleep(60)
+            else:
+                if game_instances_count > 1:
+                    logger("Changing to " +
+                        str(game_instances[i]['index']) + " BombCrypto instance.")
+                
+                    pyautogui.keyDown('alt')
+                    aux = game_instances_count
+                    while aux > 1:
+                        pyautogui.press('tab')
+                        aux = aux - 1
+                        time.sleep(0.1)
+                    pyautogui.keyUp('alt')
 
 
 exceptions = 100
