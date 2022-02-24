@@ -152,6 +152,9 @@ def show(rectangles, img=None):
     cv2.imshow('img', img)
     cv2.waitKey(0)
 
+def isVisible(img, threshold=ct['default'], printscreen = None):
+    matches = positions(img, threshold=threshold, img=printscreen)
+    return len(matches) != 0
 
 def clickBtn(img, name=None, timeout=3, threshold=ct['default']):
 
@@ -275,7 +278,7 @@ def clickGreenBarButtons():
     # ele clicka nos q tao trabaiano mas axo q n importa
     offset = 140
 
-    green_bars = positions(images['green-bar'], threshold=ct['green_bar'])
+    green_bars = positions(images['green-bar'], 0.85)
     logger('🟩 %d green bars detected' % len(green_bars))
     buttons = positions(images['go-work'], threshold=ct['go_to_work_btn'])
     logger('🆗 %d buttons detected' % len(buttons))
@@ -348,16 +351,15 @@ def refreshHeroesPositions():
     logger('🔃 Refreshing Heroes Positions')
     clickBtn(images['go-back-arrow'])
     clickBtn(images['treasure-hunt-icon'])
-
-    # time.sleep(3)
     clickBtn(images['treasure-hunt-icon'])
 
 def gameIsOpen():
-    return (not len(positions(images['go-back-arrow'])) == 0) or (not len(positions(images['treasure-hunt-icon'])) == 0) or (not len(positions(images['x-2'])) == 0) or (not len(positions(images['new-map'])) == 0)
+    img = printSreen()
+    return (not len(positions(images['go-back-arrow'], img=img)) == 0) or (not len(positions(images['treasure-hunt-icon'])) == 0) or (not len(positions(images['x-2'])) == 0) or (not len(positions(images['new-map'], img=img)) == 0)
 
 def acceptLoginTerms():
-    clickBtn(images['terms'])
-    clickBtn(images['accept'])
+    if clickBtn(images['terms']):
+        clickBtn(images['accept'])
 
 def login(refresh = False):
 
@@ -371,8 +373,13 @@ def login(refresh = False):
         # return False
 
     if refresh:
+        #pyautogui.hotkey("ctrl", "F5")
+        #time.sleep(10)
+        pass
+
+    if clickBtn(images['unity'], timeout=5):
         pyautogui.hotkey("ctrl", "F5")
-        time.sleep(10)
+        time.sleep(5)
 
     acceptLoginTerms()
 
@@ -382,7 +389,7 @@ def login(refresh = False):
         # TODO mto ele da erro e poco o botao n abre
         # time.sleep(10)
 
-        if clickBtn(images['select-wallet-2'], name='sign button', timeout=30):
+        if clickBtn(images['metamask-bomb'], timeout=30) and clickBtn(images['select-wallet-2'], name='sign button', timeout=30):
             # sometimes the sign popup appears imediately
             login_attempts = login_attempts + 1
             # print('sign button clicked')
@@ -542,27 +549,29 @@ def refreshHeroes():
 
 def checks(reset=False):
 
-    if reset is True or clickBtn(images["error"], timeout=0.05):
-        pyautogui.hotkey("ctrl", "F5")
+    printscreen = printSreen()
+
+    if isVisible(images["error"], printscreen=printscreen):
+        pyautogui.hotkey('ctrl', 'f5')
         time.sleep(15)
         return
 
-    clickBtn(images['new-map'], timeout=0.05)
-    clickBtn(images["ok"], timeout=0.05)
-    clickBtn(images["x"], timeout=0.05)
-    clickBtn(images["x-2"], timeout=0.05)
-    clickBtn(images["arrow-down"], timeout=0.05)
-    clickBtn(images['treasure-hunt-icon'], timeout=0.05)
-    clickBtn(images['new-map'], timeout=0.05)
-    clickBtn(images["ok"], timeout=0.05)
-    clickBtn(images["x"], timeout=0.05)
-    clickBtn(images["x-2"], timeout=0.05)
-    clickBtn(images["arrow-down"], timeout=0.05)
-    clickBtn(images['treasure-hunt-icon'], timeout=0.05)
+    isVisible(images['new-map'], printscreen=printscreen)
+    isVisible(images["ok"], printscreen=printscreen)
+    isVisible(images["x"], printscreen=printscreen)
+    isVisible(images["x-2"], printscreen=printscreen)
+    isVisible(images["arrow-down"], printscreen=printscreen)
+    isVisible(images['treasure-hunt-icon'], printscreen=printscreen)
+    isVisible(images['new-map'], printscreen=printscreen)
+    isVisible(images["ok"], printscreen=printscreen)
+    isVisible(images["x"], printscreen=printscreen)
+    isVisible(images["x-2"], printscreen=printscreen)
+    isVisible(images["arrow-down"], printscreen=printscreen)
+    isVisible(images['treasure-hunt-icon'], printscreen=printscreen)
 
 
 def main():
-    time.sleep(5)
+    time.sleep(1 * 1 * 5)
     game_instances = []
 
     for i in range(0, game_instances_count):
@@ -583,16 +592,14 @@ def main():
             any_action_taken = False
             logged_in = False
 
-            if gameIsOpen():
+            if gameIsOpen() or login(True) == True:
                 logged_in = True
-
-            if not logged_in and login(True) != False:
-                logged_in = True
-                any_action_taken = True
                 sys.stdout.flush()
 
             if logged_in == True:
                 
+                any_action_taken = True
+
                 if now - game_instances[i]["heroes"] > t['send_heroes_for_work'] * 60:
 
                     if game_instances[i]["refresh_heroes_count"] > 5:
@@ -604,7 +611,8 @@ def main():
                         game_instances[i]["refresh_heroes_count"] = game_instances[i]["refresh_heroes_count"] + 1
                         any_action_taken = True
                     else:
-                        pyautogui.hotkey("ctrl", "F5")
+                        pass
+                        #pyautogui.hotkey("ctrl", "F5")
 
                 if now - game_instances[i]["refresh_heroes"] > t['refresh_heroes_positions'] * 60:
                     game_instances[i]["refresh_heroes"] = now
@@ -614,19 +622,20 @@ def main():
             sys.stdout.flush()
 
             if any_action_taken is False or game_instances_count == 1:
-                time.sleep(60)
-            else:
-                if game_instances_count > 1:
-                    logger("Changing to " +
-                        str(game_instances[i]['index']) + " BombCrypto instance.")
-                
-                    pyautogui.keyDown('alt')
-                    aux = game_instances_count
-                    while aux > 1:
-                        pyautogui.press('tab')
-                        aux = aux - 1
-                        time.sleep(0.1)
-                    pyautogui.keyUp('alt')
+                logger('5 minutes sleep')
+                time.sleep(5 * 60)
+            
+            if game_instances_count > 1:
+                logger("Changing to " +
+                    str(game_instances[i]['index']) + " BombCrypto instance.")
+            
+                pyautogui.keyDown('alt')
+                aux = game_instances_count
+                while aux > 1:
+                    pyautogui.press('tab')
+                    aux = aux - 1
+                    time.sleep(0.001)
+                pyautogui.keyUp('alt')
 
 
 exceptions = 100
